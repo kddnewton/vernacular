@@ -49,7 +49,8 @@ module Vernacular
 
     def compile_parser(filepath)
       output = File.expand_path('../parser.rb', __FILE__)
-      `racc --superclass=Parser::Base -o #{output} #{filepath}`
+      exec_path = Gem.activate_bin_path('racc', 'racc', [])
+      `#{exec_path} --superclass=Parser::Base -o #{output} #{filepath}`
       File.write(output, File.read(output).gsub('Ruby24', 'Vernacular'))
     end
 
