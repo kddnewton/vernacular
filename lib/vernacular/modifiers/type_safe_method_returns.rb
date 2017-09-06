@@ -3,9 +3,9 @@ module Vernacular
     class TypeSafeMethodReturns < ASTModifier
       def initialize
         super do |modifier|
-          modifier.extend_parser(:f_arglist, 'f_arglist tEQL cpath') do
+          modifier.extend_parser(:f_arglist, 'f_arglist tEQL cpath', <<~PARSE)
             result = @builder.type_check_arglist(*val)
-          end
+          PARSE
 
           modifier.extend_builder(:type_check_arglist) do |arglist, equal, cpath|
             arglist << n(:type_check_arglist, [equal, cpath], nil)

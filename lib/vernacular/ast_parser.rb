@@ -14,7 +14,7 @@ module Vernacular
         compile_parser(file.path)
       end
 
-      load 'extensions/parser.rb'
+      load 'vernacular/parser.rb'
       Parser::Vernacular.new(builder)
     end
 

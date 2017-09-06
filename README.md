@@ -67,9 +67,9 @@ AST modifiers are somewhat more difficult to configure. A basic knowledge of the
 Vernacular::Modifiers::ASTModifier.new do |modifier|
   # Extend the parser to support the function name colon class path pattern: a
   # common way for languages to express the type of function arguments.
-  modifier.extend_parser(:f_arg, 'f_arg tCOLON cpath') do
+  modifier.extend_parser(:f_arg, 'f_arg tCOLON cpath', <<~PARSE)
     result = @builder.type_check_arg(*val)
-  end
+  PARSE
 
   # Extend the builder by adding a `type_check_arg` function that the parser can
   # call (above) that will build an appropriate `type_check_arg` node in place

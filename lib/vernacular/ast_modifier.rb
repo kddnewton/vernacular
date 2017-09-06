@@ -6,7 +6,7 @@ module Vernacular
     ParserExtension = Struct.new(:symbol, :pattern, :code)
     attr_reader :parser_extensions
 
-    attr_reader :rewriter_class
+    attr_reader :rewriter_block
 
     def initialize
       @builder_extensions = []
@@ -15,23 +15,21 @@ module Vernacular
     end
 
     def build_rewriter(&block)
-      @rewriter_class = Class.new(Parser::Rewriter, &block)
+      @rewriter_block = block
     end
 
     def extend_builder(method, &block)
       builder_extensions << BuilderExtension.new(method, block)
     end
 
-    def extend_parser(symbol, pattern, &block)
-      filepath, lineno = block.source_location
-      code = File.readlines(filepath)[lineno..-1].take_while { |line| line.strip != 'end' }.join
+    def extend_parser(symbol, pattern, code)
       parser_extensions << ParserExtension.new(symbol, pattern, code)
     end
 
     def modify(source)
-      raise 'You must first configure a rewriter!' unless rewriter_class
+      raise 'You must first configure a rewriter!' unless rewriter_block
 
-      rewriter = rewriter_class.new
+      rewriter = Class.new(Parser::Rewriter, &rewriter_block).new
       rewriter.instance_variable_set(:@parser, ASTParser.parser)
 
       buffer = Parser::Source::Buffer.new('<dynamic>')
@@ -42,7 +40,9 @@ module Vernacular
     end
 
     def components
-      builder_extensions + parser_extensions
+      builder_extensions.flat_map { |ext| [ext.method, ext.block.source_location] } +
+        parser_extensions.flat_map { |ext| [ext.symbol, ext.pattern, ext.code] } +
+        rewriter_block.source_location
     end
   end
 end

@@ -40,7 +40,7 @@ module Vernacular
 
       digest = Digest::MD5.new
       modifiers.each do |modifier|
-        digest << modifier.components.map(&:inspect).inspect
+        digest << modifier.components.inspect
       end
 
       @iseq_dir = File.expand_path(File.join('../.iseq', digest.to_s), __dir__)

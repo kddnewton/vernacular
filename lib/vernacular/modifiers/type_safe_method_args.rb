@@ -3,9 +3,9 @@ module Vernacular
     class TypeSafeMethodArgs < ASTModifier
       def initialize
         super do |modifier|
-          modifier.extend_parser(:f_arg, 'f_arg tCOLON cpath') do
+          modifier.extend_parser(:f_arg, 'f_arg tCOLON cpath', <<~PARSE)
             result = @builder.type_check_arg(*val)
-          end
+          PARSE
 
           modifier.extend_builder(:type_check_arg) do |args, colon, cpath|
             location = args[0].loc.with_operator(loc(colon))
@@ -30,7 +30,10 @@ module Vernacular
                 remove(arg.children[1].loc.expression)
               end
 
-              insert_before(node.children[2].loc.expression, type_checks)
+              unless type_checks.empty?
+                insert_before(node.children[2].loc.expression, type_checks)
+              end
+
               super
             end
 
