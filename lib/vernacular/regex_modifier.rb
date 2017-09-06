@@ -15,7 +15,7 @@ module Vernacular
     end
 
     def components
-      [pattern, replacement, block && block.source_location]
+      [pattern, replacement] + (block ? block.source_location : [])
     end
   end
 end
