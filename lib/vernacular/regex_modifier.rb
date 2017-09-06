@@ -13,5 +13,9 @@ module Vernacular
         source.gsub(pattern, replacement) :
         source.gsub(pattern, &block)
     end
+
+    def components
+      [pattern, replacement, block && block.source_location]
+    end
   end
 end

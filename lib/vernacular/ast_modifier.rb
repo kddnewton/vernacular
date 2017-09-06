@@ -40,5 +40,9 @@ module Vernacular
       ast = ASTParser.parse(source)
       rewriter.rewrite(buffer, ast)
     end
+
+    def components
+      builder_extensions + parser_extensions
+    end
   end
 end

@@ -14,8 +14,8 @@ module Vernacular
       end
 
       iseq = RubyVM::InstructionSequence.compile(source)
-      digest = ::Digest::SHA1.file(source_path).digest
-      File.binwrite(iseq_path, iseq.to_binary("SHA-1:#{digest}"))
+      digest = ::Digest::MD5.file(source_path).digest
+      File.binwrite(iseq_path, iseq.to_binary("MD5:#{digest}"))
       iseq
     rescue SyntaxError, RuntimeError
       nil

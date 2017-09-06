@@ -1,5 +1,7 @@
 # Vernacular
 
+[![Build Status](https://travis-ci.org/kddeisz/vernacular.svg?branch=master)](https://travis-ci.org/kddeisz/vernacular)
+
 Allows extending ruby's syntax and compilation process.
 
 ## Installation
