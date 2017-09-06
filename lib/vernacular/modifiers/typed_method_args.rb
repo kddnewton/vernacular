@@ -1,6 +1,6 @@
 module Vernacular
   module Modifiers
-    class TypeSafeMethodArgs < ASTModifier
+    class TypedMethodArgs < ASTModifier
       def initialize
         super do |modifier|
           modifier.extend_parser(:f_arg, 'f_arg tCOLON cpath', <<~PARSE)

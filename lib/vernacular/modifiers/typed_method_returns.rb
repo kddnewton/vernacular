@@ -1,6 +1,6 @@
 module Vernacular
   module Modifiers
-    class TypeSafeMethodReturns < ASTModifier
+    class TypedMethodReturns < ASTModifier
       def initialize
         super do |modifier|
           modifier.extend_parser(:f_arglist, 'f_arglist tEQL cpath', <<~PARSE)
