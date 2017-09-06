@@ -65,44 +65,39 @@ AST modifiers are somewhat more difficult to configure. A basic knowledge of the
 
 ```ruby
 Vernacular::Modifiers::ASTModifier.new do |modifier|
-  # Extend the parser to support the function name colon class path pattern: a
-  # common way for languages to express the type of function arguments.
-  modifier.extend_parser(:f_arg, 'f_arg tCOLON cpath', <<~PARSE)
-    result = @builder.type_check_arg(*val)
+  # Extend the parser to support and equal sign and a class path following the
+  # declaration of a functions arguments to represent its return type.
+  modifier.extend_parser(:f_arglist, 'f_arglist tEQL cpath', <<~PARSE)
+    result = @builder.type_check_arglist(*val)
   PARSE
 
-  # Extend the builder by adding a `type_check_arg` function that the parser can
-  # call (above) that will build an appropriate `type_check_arg` node in place
-  # of an argument.
-  modifier.extend_builder(:type_check_arg) do |args, colon, cpath|
-    location = args[0].loc.with_operator(loc(colon))
-                          .with_expression(join_exprs(args[0], cpath))
-    [n(:type_check_arg, [args, cpath], location)]
+  # Extend the builder by adding a `type_check_arglist` function that will build
+  # a new node type and place it at the end of the argument list.
+  modifier.extend_builder(:type_check_arglist) do |arglist, equal, cpath|
+    arglist << n(:type_check_arglist, [equal, cpath], nil)
   end
 
   # Extend the rewriter by adding an `on_def` callback, which will be called
   # whenever a `def` node is added to the AST. Then, loop through and find any
-  # `type_check_arg` child nodes, and replace them with normal argument nodes.
-  # Finally, insert the appropriate raises into the beginning of the function to
-  # mirror the type checking.
+  # `type_check_arglist` nodes, and remove them. Finally, insert the
+  # appropriate raises around the execution of the function to mirror the type
+  # checking.
   modifier.build_rewriter do
     def on_def(node)
-      type_checks = ''
+      type_check_node = node.children[1].children.last
+      return super if !type_check_node || type_check_node.type != :type_check_arglist
 
-      node.children[1].children.each do |arg|
-        next unless arg.type == :type_check_arg
+      remove(type_check_node.children[0][1])
+      remove(type_check_node.children[1].loc.expression)
+      type = build_constant(type_check_node.children[1])
 
-        arg_name = arg.children[0][0].children[0]
-        type = build_constant(arg.children[1])
-
-        type_checks << "raise ArgumentError, \"Invalid type, expected #{type}, " <<
-          "got \#{#{arg_name}.class.name}\" unless #{arg_name}.is_a?(#{type});"
-
-        remove(arg.loc.operator)
-        remove(arg.children[1].loc.expression)
+      @source_rewriter.transaction do
+        insert_before(node.children[2].loc.expression, "result = begin\n")
+        insert_after(node.children[2].loc.expression,
+          "\nend\nraise \"Invalid return value, expected #{type}, " <<
+          "got \#{result.class.name}\" unless result.is_a?(#{type})\nresult")
       end
 
-      insert_before(node.children[2].loc.expression, type_checks)
       super
     end
 
