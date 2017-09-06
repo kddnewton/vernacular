@@ -1,3 +1,4 @@
+require 'date'
 require 'digest/sha1'
 require 'parser'
 require 'tempfile'
@@ -12,7 +13,7 @@ Dir[File.expand_path('vernacular/modifiers/*', __dir__)].each do |file|
 end
 
 module Vernacular
-  module IseqMixin
+  module ISeqMixin
     def load_iseq(filepath)
       return nil if filepath == File.expand_path('vernacular/parser.rb', __dir__)
       ::Vernacular::SourceFile.load_iseq(filepath)
@@ -39,7 +40,7 @@ module Vernacular
     end
   end
 
-  self.iseq_dir = File.expand_path(File.join('..', '.iseq'), __dir__)
+  self.iseq_dir = File.expand_path('../.iseq', __dir__)
   FileUtils.mkdir_p(iseq_dir) unless File.directory?(iseq_dir)
 
   self.modifiers = []

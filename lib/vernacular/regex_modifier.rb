@@ -9,7 +9,9 @@ module Vernacular
     end
 
     def modify(source)
-      source.gsub(pattern, replacement, &block)
+      replacement ?
+        source.gsub(pattern, replacement) :
+        source.gsub(pattern, &block)
     end
   end
 end
