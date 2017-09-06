@@ -6,6 +6,7 @@ require 'uri'
 
 require 'vernacular/ast_modifier'
 require 'vernacular/ast_parser'
+require 'vernacular/configuration_hash'
 require 'vernacular/regex_modifier'
 require 'vernacular/source_file'
 
@@ -38,12 +39,8 @@ module Vernacular
       @modifiers = []
       yield self
 
-      digest = Digest::MD5.new
-      modifiers.each do |modifier|
-        digest << modifier.components.inspect
-      end
-
-      @iseq_dir = File.expand_path(File.join('../.iseq', digest.to_s), __dir__)
+      hash = ConfigurationHash.new(modifiers).hash
+      @iseq_dir = File.expand_path(File.join('../.iseq', hash), __dir__)
       FileUtils.mkdir_p(iseq_dir) unless File.directory?(iseq_dir)
 
       class << RubyVM::InstructionSequence
