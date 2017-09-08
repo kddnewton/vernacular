@@ -14,11 +14,15 @@ Dir[File.expand_path('vernacular/modifiers/*', __dir__)].each do |file|
   require file
 end
 
+# Allows extending ruby's syntax and compilation process
 module Vernacular
+  # Module that gets included into `RubyVM::InstructionSequence` in order to
+  # hook into the require process.
   module InstructionSequenceMixin
+    PARSER_PATH = File.expand_path('vernacular/parser.rb', __dir__).freeze
+
     def load_iseq(filepath)
-      return nil if filepath == File.expand_path('vernacular/parser.rb', __dir__)
-      ::Vernacular::SourceFile.load_iseq(filepath)
+      ::Vernacular::SourceFile.load_iseq(filepath) if filepath != PARSER_PATH
     end
   end
 
@@ -51,7 +55,8 @@ module Vernacular
     end
 
     def iseq_path_for(source_path)
-      source_path.gsub(/[^A-Za-z0-9\._-]/) { |c| '%02x' % c.ord }.gsub('.rb', '.yarb')
+      source_path.gsub(/[^A-Za-z0-9\._-]/) { |c| '%02x' % c.ord }
+                 .gsub('.rb', '.yarb')
     end
   end
 end

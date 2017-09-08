@@ -1,9 +1,22 @@
 module Vernacular
+  # Represents a modification that will be performed against the AST between the
+  # time that the source code is read and the time that it is compiled down to
+  # YARV instruction sequences.
   class ASTModifier
-    BuilderExtension = Struct.new(:method, :block)
+    BuilderExtension =
+      Struct.new(:method, :block) do
+        def components
+          [method, block.source_location]
+        end
+      end
     attr_reader :builder_extensions
 
-    ParserExtension = Struct.new(:symbol, :pattern, :code)
+    ParserExtension =
+      Struct.new(:symbol, :pattern, :code) do
+        def components
+          [symbol, pattern, code]
+        end
+      end
     attr_reader :parser_extensions
 
     attr_reader :rewriter_block
@@ -11,7 +24,7 @@ module Vernacular
     def initialize
       @builder_extensions = []
       @parser_extensions = []
-      yield self
+      yield self if block_given?
     end
 
     def build_rewriter(&block)
@@ -40,8 +53,7 @@ module Vernacular
     end
 
     def components
-      builder_extensions.flat_map { |ext| [ext.method, ext.block.source_location] } +
-        parser_extensions.flat_map { |ext| [ext.symbol, ext.pattern, ext.code] } +
+      (builder_extensions + parser_extensions).flat_map(&:components) +
         rewriter_block.source_location
     end
   end

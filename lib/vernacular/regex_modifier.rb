@@ -1,4 +1,6 @@
 module Vernacular
+  # Represents a modification to Ruby source that should be injected into the
+  # require process that modifies the source via a regex pattern.
   class RegexModifier
     attr_reader :pattern, :replacement, :block
 
@@ -9,9 +11,11 @@ module Vernacular
     end
 
     def modify(source)
-      replacement ?
-        source.gsub(pattern, replacement) :
+      if replacement
+        source.gsub(pattern, replacement)
+      else
         source.gsub(pattern, &block)
+      end
     end
 
     def components

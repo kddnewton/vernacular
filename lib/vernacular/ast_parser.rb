@@ -1,4 +1,6 @@
 module Vernacular
+  # Handles monkeying around with the `parser` gem to get it to handle the
+  # various modifications that users can configure `Vernacular` to perform.
   class ASTParser
     def parser
       source = parser_source
@@ -9,11 +11,7 @@ module Vernacular
         end
       end
 
-      with_tempfile do |file|
-        file.write(source)
-        compile_parser(file.path)
-      end
-
+      write_parser(source)
       load 'vernacular/parser.rb'
       Parser::Vernacular.new(builder)
     end
@@ -21,7 +19,9 @@ module Vernacular
     class << self
       def parse(string)
         parser.reset
-        parser.parse(Parser::Base.send(:setup_source_buffer, '(string)', 1, string, @parser.default_encoding))
+        buffer = Parser::Base.send(:setup_source_buffer, '(string)', 1, string,
+                                   @parser.default_encoding)
+        parser.parse(buffer)
       end
 
       def parser
@@ -54,32 +54,32 @@ module Vernacular
       File.write(output, File.read(output).gsub('Ruby24', 'Vernacular'))
     end
 
+    # rubocop:disable Metrics/MethodLength
     def extend_parser(source, parser_extension)
-      edited = []
       needle = "#{parser_extension.symbol}:"
       pattern = /\A\s+#{needle}/
 
-      source.split("\n").each do |line|
+      source.split("\n").each_with_object([]) do |line, edited|
         if line =~ pattern
           lhs, rhs = line.split(needle)
-          edited << "#{lhs}#{needle} #{parser_extension.pattern}"
-          edited << "{\n#{parser_extension.code}\n}\n#{lhs}|#{rhs}"
+          edited << "#{lhs}#{needle} #{parser_extension.pattern}\n" \
+                    "{\n#{parser_extension.code}\n}\n#{lhs}|#{rhs}"
         else
           edited << line
         end
-      end
-
-      edited.join("\n")
+      end.join("\n")
     end
+    # rubocop:enable Metrics/MethodLength
 
     def parser_source
-      filepath, _ = Parser.method(:check_for_encoding_support).source_location
+      filepath, = Parser.method(:check_for_encoding_support).source_location
       File.read(File.expand_path('../../lib/parser/ruby24.y', filepath))
     end
 
-    def with_tempfile
+    def write_parser(source)
       file = Tempfile.new(['parser-', '.y'])
-      yield file
+      file.write(source)
+      compile_parser(file.path)
     ensure
       file.close
       file.unlink
