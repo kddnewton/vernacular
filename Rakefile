@@ -10,9 +10,9 @@ Rake::TestTask.new(:test) do |t|
   t.test_files = FileList['test/**/*_test.rb']
 end
 
-task default: :test
-
 desc 'Clear out compiled files'
 task :clear do
   `rm -r .iseq`
 end
+
+task default: :test

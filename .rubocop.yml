@@ -1,0 +1,18 @@
+AllCops:
+  DisplayCopNames: true
+  DisplayStyleGuide: true
+  TargetRubyVersion: 2.3
+  Exclude:
+  - 'lib/vernacular/parser.rb'
+  - 'test/date_sigil_test.rb'
+  - 'test/number_sigil_test.rb'
+  - 'test/type_safe_method_args_test.rb'
+  - 'test/type_safe_method_returns_test.rb'
+  - 'test/uri_sigil_test.rb'
+  - 'vendor/**/*'
+
+Style/FormatString:
+  EnforcedStyle: percent
+
+Style/FrozenStringLiteralComment:
+  Enabled: false

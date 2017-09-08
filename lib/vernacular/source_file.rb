@@ -1,4 +1,6 @@
 module Vernacular
+  # Represents a file that contains Ruby source code that can be read from and
+  # compiled down to instruction sequences.
   class SourceFile
     attr_reader :source_path, :iseq_path
 
@@ -22,7 +24,8 @@ module Vernacular
     end
 
     def load
-      if File.exist?(iseq_path) && (File.mtime(source_path) <= File.mtime(iseq_path))
+      if File.exist?(iseq_path) &&
+         (File.mtime(source_path) <= File.mtime(iseq_path))
         RubyVM::InstructionSequence.load_from_binary(File.binread(iseq_path))
       else
         dump
