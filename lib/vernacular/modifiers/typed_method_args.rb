@@ -54,7 +54,7 @@ module Vernacular
 
         def type_check(arg_node)
           arg_name = arg_node.children[0][0].children[0]
-          type = build_constant(arg.children[1])
+          type = build_constant(arg_node.children[1])
           "raise ArgumentError, \"Invalid type, expected #{type}, got " \
             "\#{#{arg_name}.class.name}\" unless #{arg_name}.is_a?(#{type});"
         end
