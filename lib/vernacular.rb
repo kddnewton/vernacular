@@ -38,8 +38,6 @@ module Vernacular
     end
 
     def configure
-      return if @configured
-
       @modifiers = []
       yield self
 
@@ -50,8 +48,12 @@ module Vernacular
       class << RubyVM::InstructionSequence
         prepend ::Vernacular::InstructionSequenceMixin
       end
+    end
 
-      @configured = true
+    # Use every available pre-configured modifier
+    def give_me_all_the_things!
+      @modifiers =
+        Modifiers.constants.map { |constant| Modifiers.const_get(constant).new }
     end
 
     def iseq_path_for(source_path)
