@@ -16,11 +16,11 @@ end
 
 # Allows extending ruby's syntax and compilation process
 module Vernacular
+  PARSER_PATH = File.expand_path('vernacular/parser.rb', __dir__).freeze
+
   # Module that gets included into `RubyVM::InstructionSequence` in order to
   # hook into the require process.
   module InstructionSequenceMixin
-    PARSER_PATH = File.expand_path('vernacular/parser.rb', __dir__).freeze
-
     def load_iseq(filepath)
       ::Vernacular::SourceFile.load_iseq(filepath) if filepath != PARSER_PATH
     end
@@ -29,11 +29,15 @@ module Vernacular
   # Module that gets included into `Bootsnap::CompileCache::ISeq` in order to
   # hook into the bootsnap compilation process.
   module BootsnapMixin
-    def input_to_storage(contents, _)
+    def input_to_storage(contents, filepath)
+      if filepath == PARSER_PATH
+        raise ::Bootsnap::CompileCache::Uncompilable, "can't compile parser"
+      end
+
       contents = ::Vernacular.modify(contents)
-      RubyVM::InstructionSequence.compile(contents).to_binary
+      RubyVM::InstructionSequence.compile(contents, filepath, filepath).to_binary
     rescue SyntaxError
-      raise Bootsnap::CompileCache::Uncompilable, 'syntax error'
+      raise ::Bootsnap::CompileCache::Uncompilable, 'syntax error'
     end
   end
 
