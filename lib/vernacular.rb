@@ -16,13 +16,29 @@ end
 
 # Allows extending ruby's syntax and compilation process
 module Vernacular
+  PARSER_PATH = File.expand_path('vernacular/parser.rb', __dir__).freeze
+
   # Module that gets included into `RubyVM::InstructionSequence` in order to
   # hook into the require process.
   module InstructionSequenceMixin
-    PARSER_PATH = File.expand_path('vernacular/parser.rb', __dir__).freeze
-
     def load_iseq(filepath)
       ::Vernacular::SourceFile.load_iseq(filepath) if filepath != PARSER_PATH
+    end
+  end
+
+  # Module that gets included into `Bootsnap::CompileCache::ISeq` in order to
+  # hook into the bootsnap compilation process.
+  module BootsnapMixin
+    def input_to_storage(contents, filepath)
+      if filepath == PARSER_PATH
+        raise ::Bootsnap::CompileCache::Uncompilable, "can't compile parser"
+      end
+
+      contents = ::Vernacular.modify(contents)
+      iseq = RubyVM::InstructionSequence.compile(contents, filepath, filepath)
+      iseq.to_binary
+    rescue SyntaxError
+      raise ::Bootsnap::CompileCache::Uncompilable, 'syntax error'
     end
   end
 
@@ -45,9 +61,7 @@ module Vernacular
       @iseq_dir = File.expand_path(File.join('../.iseq', hash), __dir__)
       FileUtils.mkdir_p(iseq_dir) unless File.directory?(iseq_dir)
 
-      class << RubyVM::InstructionSequence
-        prepend ::Vernacular::InstructionSequenceMixin
-      end
+      install
     end
 
     # Use every available pre-configured modifier
@@ -56,9 +70,31 @@ module Vernacular
         Modifiers.constants.map { |constant| Modifiers.const_get(constant).new }
     end
 
+    def modify(source)
+      modifiers.each do |modifier|
+        source = modifier.modify(source)
+      end
+      source
+    end
+
     def iseq_path_for(source_path)
       source_path.gsub(/[^A-Za-z0-9\._-]/) { |c| '%02x' % c.ord }
                  .gsub('.rb', '.yarb')
+    end
+
+    private
+
+    def install
+      @installed ||=
+        if defined?(Bootsnap)
+          class << Bootsnap::CompileCache::ISeq
+            prepend ::Vernacular::BootsnapMixin
+          end
+        else
+          class << RubyVM::InstructionSequence
+            prepend ::Vernacular::InstructionSequenceMixin
+          end
+        end
     end
   end
 end
