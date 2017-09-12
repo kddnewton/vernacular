@@ -35,7 +35,8 @@ module Vernacular
       end
 
       contents = ::Vernacular.modify(contents)
-      RubyVM::InstructionSequence.compile(contents, filepath, filepath).to_binary
+      iseq = RubyVM::InstructionSequence.compile(contents, filepath, filepath)
+      iseq.to_binary
     rescue SyntaxError
       raise ::Bootsnap::CompileCache::Uncompilable, 'syntax error'
     end

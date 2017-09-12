@@ -11,7 +11,8 @@ module Vernacular
 
     def dump
       source = Vernacular.modify(File.read(source_path))
-      iseq = RubyVM::InstructionSequence.compile(source)
+      iseq = RubyVM::InstructionSequence.compile(source, source_path,
+                                                 source_path)
       digest = ::Digest::MD5.file(source_path).digest
       File.binwrite(iseq_path, iseq.to_binary("MD5:#{digest}"))
       iseq
