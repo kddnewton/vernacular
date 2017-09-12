@@ -26,6 +26,17 @@ module Vernacular
     end
   end
 
+  # Module that gets included into `Bootsnap::CompileCache::ISeq` in order to
+  # hook into the bootsnap compilation process.
+  module BootsnapMixin
+    def input_to_storage(contents, _)
+      contents = ::Vernacular.modify(contents)
+      RubyVM::InstructionSequence.compile(contents).to_binary
+    rescue SyntaxError
+      raise Bootsnap::CompileCache::Uncompilable, 'syntax error'
+    end
+  end
+
   class << self
     attr_reader :iseq_dir, :modifiers
 
@@ -45,9 +56,7 @@ module Vernacular
       @iseq_dir = File.expand_path(File.join('../.iseq', hash), __dir__)
       FileUtils.mkdir_p(iseq_dir) unless File.directory?(iseq_dir)
 
-      class << RubyVM::InstructionSequence
-        prepend ::Vernacular::InstructionSequenceMixin
-      end
+      install
     end
 
     # Use every available pre-configured modifier
@@ -56,9 +65,31 @@ module Vernacular
         Modifiers.constants.map { |constant| Modifiers.const_get(constant).new }
     end
 
+    def modify(source)
+      modifiers.each do |modifier|
+        source = modifier.modify(source)
+      end
+      source
+    end
+
     def iseq_path_for(source_path)
       source_path.gsub(/[^A-Za-z0-9\._-]/) { |c| '%02x' % c.ord }
                  .gsub('.rb', '.yarb')
+    end
+
+    private
+
+    def install
+      @installed ||=
+        if defined?(Bootsnap)
+          class << Bootsnap::CompileCache::ISeq
+            prepend ::Vernacular::BootsnapMixin
+          end
+        else
+          class << RubyVM::InstructionSequence
+            prepend ::Vernacular::InstructionSequenceMixin
+          end
+        end
     end
   end
 end
