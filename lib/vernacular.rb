@@ -86,7 +86,7 @@ module Vernacular
 
     def install
       @installed ||=
-        if defined?(Bootsnap)
+        if defined?(Bootsnap) && using_bootsnap_compilation?
           class << Bootsnap::CompileCache::ISeq
             prepend ::Vernacular::BootsnapMixin
           end
@@ -95,6 +95,13 @@ module Vernacular
             prepend ::Vernacular::InstructionSequenceMixin
           end
         end
+    end
+
+    def using_bootsnap_compilation?
+      filepath, = RubyVM::InstructionSequence.method(:load_iseq).source_location
+      filepath =~ %r{/bootsnap/}
+    rescue NameError
+      false
     end
   end
 end
