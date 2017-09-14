@@ -11,6 +11,9 @@ AllCops:
   - 'test/uri_sigil_test.rb'
   - 'vendor/**/*'
 
+Lint/InterpolationCheck:
+  Enabled: false
+
 Style/FormatString:
   EnforcedStyle: percent
 
