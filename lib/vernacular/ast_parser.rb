@@ -12,7 +12,7 @@ module Vernacular
       end
 
       write_parser(source)
-      load 'vernacular/parser.rb'
+      load PARSER_PATH
       Parser::Vernacular.new(builder)
     end
 
@@ -48,10 +48,12 @@ module Vernacular
     end
 
     def compile_parser(filepath)
-      output = File.expand_path('../parser.rb', __FILE__)
       exec_path = Gem.activate_bin_path('racc', 'racc', [])
-      `#{exec_path} --superclass=Parser::Base -o #{output} #{filepath}`
-      File.write(output, File.read(output).gsub('Ruby24', 'Vernacular'))
+      `#{exec_path} --superclass=Parser::Base -o #{PARSER_PATH} #{filepath}`
+      File.write(
+        PARSER_PATH,
+        File.read(PARSER_PATH).gsub("Ruby#{parser_version}", 'Vernacular')
+      )
     end
 
     # rubocop:disable Metrics/MethodLength
@@ -73,7 +75,12 @@ module Vernacular
 
     def parser_source
       filepath, = Parser.method(:check_for_encoding_support).source_location
-      File.read(File.expand_path('../../lib/parser/ruby24.y', filepath))
+      grammar_filepath = "../../lib/parser/ruby#{parser_version}.y"
+      File.read(File.expand_path(grammar_filepath, filepath))
+    end
+
+    def parser_version
+      @parser_version ||= RUBY_VERSION.gsub(/\A(\d)\.(\d).+/, '\1\2')
     end
 
     def write_parser(source)
