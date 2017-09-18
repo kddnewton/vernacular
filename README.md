@@ -60,12 +60,12 @@ Vernacular::RegexModifier.new(pattern) do |match|
 end
 ```
 
-### `Modifiers::ASTModifier`
+### `ASTModifier`
 
 AST modifiers are somewhat more difficult to configure. A basic knowledge of the [`parser`](https://github.com/whitequark/parser) gem is required. First, extend the `Parser` to understand the additional syntax that you're trying to add. Second, extend the `Builder` with information about how to build s-expressions with your extra information. Finally, extend the `Rewriter` with code that will modify your extended AST by rewriting into a valid Ruby AST. An example is below:
 
 ```ruby
-Vernacular::Modifiers::ASTModifier.new do |modifier|
+Vernacular::ASTModifier.new do |modifier|
   # Extend the parser to support and equal sign and a class path following the
   # declaration of a functions arguments to represent its return type.
   modifier.extend_parser(:f_arglist, 'f_arglist tEQL cpath', <<~PARSE)
