@@ -31,7 +31,7 @@ For example,
 Vernacular.configure do |config|
   pattern = /~n\(([\d\s+-\/*\(\)]+?)\)/
   modifier =
-    Vernacular::Modifiers::RegexModifier.new(pattern) do |match|
+    Vernacular::RegexModifier.new(pattern) do |match|
       eval(match[3..-2])
     end
   config.add(modifier)
@@ -44,18 +44,18 @@ will extend Ruby syntax to allow `~n(...)` symbols which will evaluate the inter
 
 Modifiers allow you to modify the source of the Ruby code before it is compiled by injecting themselves into the require chain through `RubyVM::InstructionSequence::load_iseq`.
 
-### `Modifiers::RegexModifier`
+### `RegexModifier`
 
 Regex modifiers are by far the simpler of the two to configure. They take the same arguments as `String#gsub`. Either configure them with a string, as in:
 
 ```ruby
-Vernacular::Modifiers::RegexModifier.new(/~u\((.+?)\)/, 'URI.parse("\1")')
+Vernacular::RegexModifier.new(/~u\((.+?)\)/, 'URI.parse("\1")')
 ```
 
 or configure them using a block, as in:
 
 ```ruby
-Vernacular::Modifiers::RegexModifier.new(pattern) do |match|
+Vernacular::RegexModifier.new(pattern) do |match|
   eval(match[3..-2])
 end
 ```
