@@ -31,7 +31,7 @@ For example,
 Vernacular.configure do |config|
   pattern = /~n\(([\d\s+-\/*\(\)]+?)\)/
   modifier =
-    Vernacular::Modifiers::RegexModifier.new(pattern) do |match|
+    Vernacular::RegexModifier.new(pattern) do |match|
       eval(match[3..-2])
     end
   config.add(modifier)
@@ -44,28 +44,28 @@ will extend Ruby syntax to allow `~n(...)` symbols which will evaluate the inter
 
 Modifiers allow you to modify the source of the Ruby code before it is compiled by injecting themselves into the require chain through `RubyVM::InstructionSequence::load_iseq`.
 
-### `Modifiers::RegexModifier`
+### `RegexModifier`
 
 Regex modifiers are by far the simpler of the two to configure. They take the same arguments as `String#gsub`. Either configure them with a string, as in:
 
 ```ruby
-Vernacular::Modifiers::RegexModifier.new(/~u\((.+?)\)/, 'URI.parse("\1")')
+Vernacular::RegexModifier.new(/~u\((.+?)\)/, 'URI.parse("\1")')
 ```
 
 or configure them using a block, as in:
 
 ```ruby
-Vernacular::Modifiers::RegexModifier.new(pattern) do |match|
+Vernacular::RegexModifier.new(pattern) do |match|
   eval(match[3..-2])
 end
 ```
 
-### `Modifiers::ASTModifier`
+### `ASTModifier`
 
 AST modifiers are somewhat more difficult to configure. A basic knowledge of the [`parser`](https://github.com/whitequark/parser) gem is required. First, extend the `Parser` to understand the additional syntax that you're trying to add. Second, extend the `Builder` with information about how to build s-expressions with your extra information. Finally, extend the `Rewriter` with code that will modify your extended AST by rewriting into a valid Ruby AST. An example is below:
 
 ```ruby
-Vernacular::Modifiers::ASTModifier.new do |modifier|
+Vernacular::ASTModifier.new do |modifier|
   # Extend the parser to support and equal sign and a class path following the
   # declaration of a functions arguments to represent its return type.
   modifier.extend_parser(:f_arglist, 'f_arglist tEQL cpath', <<~PARSE)
