@@ -1,11 +1,7 @@
 require 'date'
 require 'digest'
-require 'parser'
-require 'tempfile'
 require 'uri'
 
-require 'vernacular/ast_modifier'
-require 'vernacular/ast_parser'
 require 'vernacular/configuration_hash'
 require 'vernacular/regex_modifier'
 require 'vernacular/source_file'
@@ -16,13 +12,11 @@ end
 
 # Allows extending ruby's syntax and compilation process
 module Vernacular
-  PARSER_PATH = File.expand_path('vernacular/parser.rb', __dir__).freeze
-
   # Module that gets included into `RubyVM::InstructionSequence` in order to
   # hook into the require process.
   module InstructionSequenceMixin
     def load_iseq(filepath)
-      ::Vernacular::SourceFile.load_iseq(filepath) if filepath != PARSER_PATH
+      ::Vernacular::SourceFile.load_iseq(filepath)
     end
   end
 
@@ -30,10 +24,6 @@ module Vernacular
   # hook into the bootsnap compilation process.
   module BootsnapMixin
     def input_to_storage(contents, filepath)
-      if filepath == PARSER_PATH
-        raise ::Bootsnap::CompileCache::Uncompilable, "can't compile parser"
-      end
-
       contents = ::Vernacular.modify(contents)
       iseq = RubyVM::InstructionSequence.compile(contents, filepath, filepath)
       iseq.to_binary
