@@ -2,11 +2,13 @@
 
 require 'date'
 require 'digest'
+require 'fileutils'
 require 'uri'
 
 require 'vernacular/configuration_hash'
 require 'vernacular/regex_modifier'
 require 'vernacular/source_file'
+require 'vernacular/version'
 
 Dir[File.expand_path('vernacular/modifiers/*', __dir__)].each do |file|
   require file
