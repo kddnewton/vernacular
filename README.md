@@ -42,11 +42,11 @@ will extend Ruby syntax to allow `~n(...)` symbols which will evaluate the inter
 
 ### `Modifiers`
 
-Modifiers allow you to modify the source of the Ruby code before it is compiled by injecting themselves into the require chain through `RubyVM::InstructionSequence::load_iseq`.
+Modifiers allow you to modify the source of the Ruby code before it is compiled by injecting themselves into the require chain through `RubyVM::InstructionSequence::load_iseq`. They can be any of the preconfigured modifiers built into `Vernacular`, or they can just be a plain ruby class that responds to the method `modify(source)` where `source` is a string of code. The method should returned the modified source.
 
 ### `RegexModifier`
 
-Regex modifiers are by far the simpler of the two to configure. They take the same arguments as `String#gsub`. Either configure them with a string, as in:
+Regex modifiers take the same arguments as `String#gsub`. Either configure them with a string, as in:
 
 ```ruby
 Vernacular::RegexModifier.new(/~u\((.+?)\)/, 'URI.parse("\1")')
