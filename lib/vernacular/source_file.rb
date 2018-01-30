@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Vernacular
   # Represents a file that contains Ruby source code that can be read from and
   # compiled down to instruction sequences.

@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 module Vernacular
   module Modifiers
     # Extends Ruby syntax to allow date sigils, or ~d(...). The date inside is
     # parsed and as an added benefit if it is a set value it is replaced with
     # the more efficient `strptime`.
     class DateSigil < RegexModifier
-      FORMAT = '%FT%T%:z'.freeze
+      FORMAT = '%FT%T%:z'
 
       def initialize
         super(/~d\((.+?)\)/) do |match|

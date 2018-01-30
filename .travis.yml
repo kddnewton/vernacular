@@ -1,6 +1,4 @@
 language: ruby
-rvm: 2.4.1
+rvm: 2.5.0
 cache: bundler
-script:
-- bundle exec rake
-- bundle exec rubocop
+script: bundle exec rake && bundle exec rubocop

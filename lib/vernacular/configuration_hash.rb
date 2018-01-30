@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Vernacular
   # Builds a hash out of the given modifiers that represents that current state
   # of configuration. This ensures that if the configuration of `Vernacular`

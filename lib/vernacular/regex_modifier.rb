@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Vernacular
   # Represents a modification to Ruby source that should be injected into the
   # require process that modifies the source via a regex pattern.

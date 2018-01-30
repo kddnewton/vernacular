@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Vernacular
   module Modifiers
     # Extends Ruby syntax to allow number sigils, or ~n(...). The expression
