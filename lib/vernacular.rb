@@ -79,7 +79,7 @@ module Vernacular
     private
 
     def install
-      @installed ||=
+      @install ||=
         if defined?(Bootsnap) && using_bootsnap_compilation?
           class << Bootsnap::CompileCache::ISeq
             prepend ::Vernacular::BootsnapMixin
