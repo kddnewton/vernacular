@@ -72,8 +72,9 @@ module Vernacular
     end
 
     def iseq_path_for(source_path)
-      source_path.gsub(/[^A-Za-z0-9\._-]/) { |c| format('%02x', c.ord) }
-                 .gsub('.rb', '.yarb')
+      source_path
+        .gsub(/[^A-Za-z0-9\._-]/) { |c| format('%02x', c.ord) }
+        .gsub('.rb', '.yarb')
     end
 
     private

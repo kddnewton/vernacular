@@ -7,3 +7,6 @@ AllCops:
   - 'test/number_sigil_test.rb'
   - 'test/uri_sigil_test.rb'
   - 'vendor/**/*'
+
+Style/FormatStringToken:
+  Enabled: false
