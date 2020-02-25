@@ -10,7 +10,7 @@ require 'vernacular/regex_modifier'
 require 'vernacular/source_file'
 require 'vernacular/version'
 
-Dir[File.expand_path('vernacular/modifiers/*', __dir__)].each do |file|
+Dir[File.expand_path('vernacular/modifiers/*', __dir__)].sort.each do |file|
   require file
 end
 

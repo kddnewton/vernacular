@@ -1,7 +1,7 @@
 AllCops:
   DisplayCopNames: true
   DisplayStyleGuide: true
-  TargetRubyVersion: 2.6
+  TargetRubyVersion: 2.7
   Exclude:
   - 'test/date_sigil_test.rb'
   - 'test/number_sigil_test.rb'

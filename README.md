@@ -1,6 +1,6 @@
 # Vernacular
 
-[![Build Status](https://travis-ci.com/kddeisz/vernacular.svg?branch=master)](https://travis-ci.com/kddeisz/vernacular)
+[![Build Status](https://github.com/kddeisz/vernacular/workflows/Main/badge.svg)](https://github.com/kddeisz/vernacular/actions)
 [![Gem Version](https://img.shields.io/gem/v/vernacular.svg)](https://rubygems.org/gems/vernacular)
 
 Allows extending ruby's syntax and compilation process.
