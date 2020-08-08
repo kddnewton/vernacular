@@ -3,10 +3,31 @@ AllCops:
   DisplayStyleGuide: true
   TargetRubyVersion: 2.7
   Exclude:
+  - '{tmp,vendor,yard}/**/*'
   - 'test/date_sigil_test.rb'
   - 'test/number_sigil_test.rb'
   - 'test/uri_sigil_test.rb'
-  - 'vendor/**/*'
+
+Gemspec/RequiredRubyVersion:
+  Enabled: false
+
+Layout/LineLength:
+  Max: 80
+
+Lint/AmbiguousBlockAssociation:
+  Enabled: false
+
+Naming/RescuedExceptionsVariableName:
+  Enabled: false
+
+Style/Documentation:
+  Enabled: false
+
+Style/FormatString:
+  EnforcedStyle: percent
 
 Style/FormatStringToken:
+  Enabled: false
+
+Style/PerlBackrefs:
   Enabled: false
